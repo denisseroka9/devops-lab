@@ -18,7 +18,6 @@ pipeline{
         }
 
         stage('Tests') {
-            parallel {
                 stage ('Unit') {
                     steps {
                         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
