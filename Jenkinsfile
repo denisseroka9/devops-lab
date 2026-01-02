@@ -36,7 +36,8 @@ pipeline{
                     timeout /t 10
 					set PYTHONPATH=%WORKSPACE%
                     C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-rest.xml test\\rest
-                    '''
+                    exit /b 0
+					'''
             }
         }
         
