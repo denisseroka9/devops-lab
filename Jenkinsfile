@@ -17,14 +17,13 @@ pipeline{
             }
         }
 
-        stage('Tests') {
-                stage ('Unit') {
-                    steps {
-                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                            bat '''
-                                set PYTHONPATH=%WORKSPACE%
-                                C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-unit.xml test\\unit
-                                '''
+        stage ('Unit') {
+            steps {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+					bat '''
+						set PYTHONPATH=%WORKSPACE%
+						C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-unit.xml test\\unit
+					'''
             }
         }
     }
@@ -38,10 +37,10 @@ pipeline{
 					set PYTHONPATH=%WORKSPACE%
                     C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-rest.xml test\\rest
                     '''
-                }
             }
         }
-    }    
+        
+    
         stage('Results') {
             steps {
                 junit 'result*.xml'
