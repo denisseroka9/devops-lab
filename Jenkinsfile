@@ -24,7 +24,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
                     bat '''
                         set FLASK_APP=app\\api.py
-                        start flask run
+                         start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe app\\api.py
                         
                         ping -n 10 127.0.0.1
 
