@@ -17,15 +17,13 @@ pipeline{
             }
         }
 
-        stage('Tests') {
-            parallel {
-                stage ('Unit') {
-                    steps {
-                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                            bat '''
-                                set PYTHONPATH=%WORKSPACE%
-                                C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-unit.xml test\\unit
-                                '''
+        stage ('Unit') {
+            steps {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+					bat '''
+						set PYTHONPATH=%WORKSPACE%
+						C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-unit.xml test\\unit
+					'''
             }
         }
     }
@@ -33,15 +31,17 @@ pipeline{
             steps {
                 bat '''
                     set FLASK_APP=app\\api.py
-                    start flask run
-                    start java -jar C:\\DevOps\\wiremock\\wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir test\\wiremock
-                    set PYTHONPATH=%WORKSPACE%
-                    C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-unit.xml test\\rest
-                    '''
-                }
+                    cmd /c start "" flask run --no-reload --no-debugger
+                    cmd /c start "" java -jar C:\\DevOps\\wiremock\\wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir test\\wiremock
+                    timeout /t 10
+					set PYTHONPATH=%WORKSPACE%
+                    C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-rest.xml test\\rest
+                    exit /b 0
+					'''
             }
         }
-    }    
+        
+    
         stage('Results') {
             steps {
                 junit 'result*.xml'
