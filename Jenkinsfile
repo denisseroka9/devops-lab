@@ -25,13 +25,13 @@ pipeline {
                     bat '''
                         set FLASK_APP=app\\api.py
                         start flask run
-                        start java -jar C:\\UNIR\\Ejercicios\\wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir test\\wiremock
-
+                        
                         ping -n 10 127.0.0.1
 
-                        pytest --junitxml=result-rest.xml test\\rest
+                        C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-rest.xml test\\rest
                     '''
                 }
+				junit 'result-rest.xml'
             }
         }
 
