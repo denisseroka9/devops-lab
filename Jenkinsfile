@@ -13,7 +13,7 @@ pipeline {
             steps {
                 bat '''
                     set PYTHONPATH=.
-                    C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-unit.xml test\\unit -m pytest --junitxml=result-unit.xml test\\unit
+                    C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-unit.xml test\\unit 
                 '''
                 junit 'result-unit.xml'
             }
