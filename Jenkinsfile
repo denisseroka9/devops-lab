@@ -51,6 +51,23 @@ pipeline {
 			}
 		}
 
+		stage('Security') {
+			steps {
+				catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+					bat '''
+						bandit --exit-zero -r app -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
+					'''
+					recordIssues(
+						tools: [pylint(name: 'Bandit', pattern: 'bandit.out')],
+						qualityGates: [
+							[threshold: 1, type: 'TOTAL', unstable: true],
+							[threshold: 2, type: 'TOTAL', unstable: false]
+						]
+					)
+				}
+			}
+		}
+
 		
     }
 }
