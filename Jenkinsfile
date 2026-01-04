@@ -19,21 +19,20 @@ pipeline {
             }
         }
 
-        stage('Service') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-                    bat '''
-                        set FLASK_APP=app\\api.py
-                         start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe app\\api.py
-                        
-                        ping -n 15 127.0.0.1
+		stage('Service') {
+			steps {
+				catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+					bat '''
+						start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe app\\api.py
 
-                        C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-rest.xml test\\rest
-                    '''
-                }
+						ping -n 20 127.0.0.1
+
+						C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-rest.xml test\\rest -k "add"
+					'''
+				}
 				junit 'result-rest.xml'
-            }
-        }
-
+			}
+		}
+		
     }
 }
