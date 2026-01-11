@@ -38,6 +38,17 @@ pipeline {
 			}
 		}
 
+		stage('Cobertura') {
+			steps {
+				bat '''
+					set PYTHONPATH=.
+					C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage run --branch --source=app --omit=app\\__init__.py,app\\api.py -m pytest test\\unit
+					C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage xml
+				'''
+				recordCoverage qualityGates: [[criticality: 'ERROR', integerThreshold: 85, metric: 'LINE', threshold: 85.0],[integerThreshold: 95, metric: 'LINE', threshold: 95.0],[criticality: 'ERROR', integerThreshold: 80, metric: 'BRANCH', threshold: 80.0],[integerThreshold: 90, metric: 'BRANCH', threshold: 90.0]], tools: [[parser: 'COBERTURA', pattern: 'coverage.xml']]				
+			}
+		}
+
 		
     }
 }
