@@ -31,7 +31,7 @@ pipeline {
 		stage('Security') {
 			steps {
 				bat '''
-					bandit --exit-zero -r app -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
+					C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m bandit --exit-zero -r app -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
 				'''
 				recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')], qualityGates: [[threshold: 2, type: 'TOTAL', unstable: true],[threshold: 4, type: 'TOTAL', unstable: false]]
 				
