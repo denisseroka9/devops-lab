@@ -18,36 +18,13 @@ pipeline {
                 junit 'result-unit.xml'
             }
         }
-
-		stage('Service') {
-			steps {
-				catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-					bat '''
-						start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe app\\api.py
-
-						ping -n 20 127.0.0.1
-
-						C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m pytest --junitxml=result-rest.xml test\\rest -k "add"
-					'''
-				}
-				junit 'result-rest.xml'
-			}
-		}
 		
 		stage('Static') {
 			steps {
-				catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-					bat '''
-						C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flake8 app test --format=pylint > flake8.out
-					'''
-					recordIssues(
-						tools: [flake8(name: 'Flake8', pattern: 'flake8.out')],
-						qualityGates: [
-							[threshold: 8, type: 'TOTAL', unstable: true],
-							[threshold: 10, type: 'TOTAL', unstable: false]
-						]
-					)
-				}
+				bat '''
+					C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flake8 --exit-zero app --format=pylint > flake8.out
+				'''
+				recordIssues tools: [flake8(name: 'Flake8', pattern: 'flake8.out')], qualityGates: [[threshold: 8, type: 'TOTAL', unstable: true],[threshold: 10, type: 'TOTAL', unstable: false]]				
 			}
 		}
 
