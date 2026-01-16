@@ -56,7 +56,7 @@ pipeline {
 					start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flask run
 					ping -n 6 127.0.0.1 
 
-					C:\DevOps\JMeter\bin\jmeter -n -t test\jmeter\flask.jmx -f -l flask.jtl
+					C:\\DevOps\\JMeter\\bin\\jmeter -n -t test\\jmeter\\flask.jmx -f -l flask.jtl
 				'''
 				perfReport sourceDataFiles: 'flask.jtl'
 			}
