@@ -8,6 +8,7 @@ pipeline {
         stage('Get Code') {
             agent any
             steps {
+				deleteDir()			
                 bat '''
                     whoami
                     hostname
@@ -20,7 +21,7 @@ pipeline {
 
         stage('Unit') {
             agent { label 'tests_windows' }
-            steps {
+            steps {				
                 bat '''
                     whoami
                     hostname
