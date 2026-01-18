@@ -31,7 +31,7 @@ pipeline {
 					
                     C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage run --branch --source=app --omit=app\\__init__.py,app\\api.py -m pytest --junitxml=result-unit.xml test\\unit
                 '''
-                junit 'result-unit.xml'
+                junit 'helloworld/result-unit.xml'
 				
 				stash name: 'workspace-after-unit', includes: '**'
             }
