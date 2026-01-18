@@ -1,11 +1,20 @@
 pipeline {
-    agent any
+    agent none
+	
+	options { skipDefaultCheckout() }
 
     stages {
 
         stage('Get Code') {
+            agent any
             steps {
-                git 'https://github.com/anieto-unir/helloworld.git'
+                bat '''
+                    whoami
+                    hostname
+                    echo %WORKSPACE%
+					
+                    git https://github.com/anieto-unir/helloworld.git
+                '''
             }
         }
 
