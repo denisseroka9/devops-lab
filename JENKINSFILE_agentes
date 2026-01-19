@@ -5,118 +5,117 @@ pipeline {
 
     stages {
 
-			stage('Get Code') {
-				agent any
-				steps {
-					deleteDir()			
-					bat '''
-						whoami
-						hostname
-						echo %WORKSPACE%
-						
-						git clone https://github.com/anieto-unir/helloworld.git
-					'''
-				}
-			}
-
-			stage('Unit') {
-				agent { label 'tests_windows' }
-				steps {				
-					bat '''
-						whoami
-						hostname
-						echo %WORKSPACE%
-						cd helloworld
-						set PYTHONPATH=.
-						
-						C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage run --branch --source=app --omit=app\\__init__.py,app\\api.py -m pytest --junitxml=result-unit.xml test\\unit
-					'''
-					junit 'helloworld/result-unit.xml'
+		stage('Get Code') {
+			agent any
+			steps {
+				deleteDir()			
+				bat '''
+					whoami
+					hostname
+					echo %WORKSPACE%
 					
-					stash name: 'workspace-after-unit', includes: '**'
-				}
+					git clone https://github.com/anieto-unir/helloworld.git
+				'''
 			}
-			
-			stage ('Tests') {
-				parallel {
+		}
 
-						stage('Static') {
-							agent { label 'tests_windows' }
-							steps {
-								unstash 'workspace-after-unit'
-								
-								bat '''
-									whoami
-									hostname
-									echo %WORKSPACE%
-									
-									C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flake8 --exit-zero app --format=pylint > flake8.out
-								'''
-								recordIssues tools: [flake8(name: 'Flake8', pattern: 'flake8.out')], qualityGates: [[threshold: 8, type: 'TOTAL', unstable: true],[threshold: 10, type: 'TOTAL', unstable: false]]
-							}
-						}
-
-						stage('Security') {
-							agent { label 'tests_windows' }
-							steps {
-								unstash 'workspace-after-unit'
-							
-								bat '''
-									whoami
-									hostname
-									echo %WORKSPACE%
-									
-									C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m bandit --exit-zero -r app -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
-								'''
-								recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')], qualityGates: [[threshold: 2, type: 'TOTAL', unstable: true],[threshold: 4, type: 'TOTAL', unstable: false]]
-							}
-						}
-
-						stage('Cobertura') {
-							agent { label 'tests_windows' }
-							steps {
-								unstash 'workspace-after-unit'
-								dir ('helloworld') {
-							
-								bat '''
-									whoami
-									hostname
-									echo %WORKSPACE%
-									
-									C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage xml
-								'''
-								recordCoverage qualityGates: [[criticality: 'ERROR', integerThreshold: 85, metric: 'LINE', threshold: 85.0],[integerThreshold: 95, metric: 'LINE', threshold: 95.0],[criticality: 'ERROR', integerThreshold: 80, metric: 'BRANCH', threshold: 80.0],[integerThreshold: 90, metric: 'BRANCH', threshold: 90.0]], tools: [[parser: 'COBERTURA', pattern: 'coverage.xml']]
-							}
-						}
-					}
-				}
-			}
+		stage('Unit') {
+			agent { label 'tests_windows' }
+			steps {				
+				bat '''
+					whoami
+					hostname
+					echo %WORKSPACE%
+					cd helloworld
+					set PYTHONPATH=.
 					
-
-			stage('Performance') {
-				agent { label 'performance_windows' }
-				steps {
-					unstash 'workspace-after-unit'
-
-					dir('helloworld') {
-						bat '''
-							whoami
-							hostname
-							echo %WORKSPACE%
-
-							set FLASK_APP=app\\api.py
-							start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flask run
-
-							ping -n 6 127.0.0.1 > nul
-
-							C:\\DevOps\\JMeter\\bin\\jmeter -n -t test\\jmeter\\flask.jmx -f -l flask.jtl
-						'''
-					}
-
-					perfReport sourceDataFiles: 'helloworld/flask.jtl'
-				}
-			}	
+					C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage run --branch --source=app --omit=app\\__init__.py,app\\api.py -m pytest --junitxml=result-unit.xml test\\unit
+				'''
+				junit 'helloworld/result-unit.xml'
+				
+				stash name: 'workspace-after-unit', includes: '**'
+			}
 		}
 		
-    }
+		stage ('Tests') {
+			parallel {
+
+					stage('Static') {
+						agent { label 'tests_windows' }
+						steps {
+							unstash 'workspace-after-unit'
+							
+							bat '''
+								whoami
+								hostname
+								echo %WORKSPACE%
+								
+								C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flake8 --exit-zero app --format=pylint > flake8.out
+							'''
+							recordIssues tools: [flake8(name: 'Flake8', pattern: 'flake8.out')], qualityGates: [[threshold: 8, type: 'TOTAL', unstable: true],[threshold: 10, type: 'TOTAL', unstable: false]]
+						}
+					}
+
+					stage('Security') {
+						agent { label 'tests_windows' }
+						steps {
+							unstash 'workspace-after-unit'
+						
+							bat '''
+								whoami
+								hostname
+								echo %WORKSPACE%
+								
+								C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m bandit --exit-zero -r app -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
+							'''
+							recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')], qualityGates: [[threshold: 2, type: 'TOTAL', unstable: true],[threshold: 4, type: 'TOTAL', unstable: false]]
+						}
+					}
+
+					stage('Cobertura') {
+						agent { label 'tests_windows' }
+						steps {
+							unstash 'workspace-after-unit'
+							dir ('helloworld') {
+						
+							bat '''
+								whoami
+								hostname
+								echo %WORKSPACE%
+								
+								C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage xml
+							'''
+							recordCoverage qualityGates: [[criticality: 'ERROR', integerThreshold: 85, metric: 'LINE', threshold: 85.0],[integerThreshold: 95, metric: 'LINE', threshold: 95.0],[criticality: 'ERROR', integerThreshold: 80, metric: 'BRANCH', threshold: 80.0],[integerThreshold: 90, metric: 'BRANCH', threshold: 90.0]], tools: [[parser: 'COBERTURA', pattern: 'coverage.xml']]
+						}
+					}
+				}
+			}
+		}
+				
+
+		stage('Performance') {
+			agent { label 'performance_windows' }
+			steps {
+				unstash 'workspace-after-unit'
+
+				dir('helloworld') {
+					bat '''
+						whoami
+						hostname
+						echo %WORKSPACE%
+
+						set FLASK_APP=app\\api.py
+						start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flask run
+
+						ping -n 6 127.0.0.1 > nul
+
+						C:\\DevOps\\JMeter\\bin\\jmeter -n -t test\\jmeter\\flask.jmx -f -l flask.jtl
+					'''
+				}
+
+				perfReport sourceDataFiles: 'helloworld/flask.jtl'
+			}
+		}	
+	}
 }
+
