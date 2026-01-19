@@ -93,23 +93,29 @@ pipeline {
 		}
 				
 
-        stage('Performance') {
-            agent { label 'performance_windows' }
-            steps {
+		stage('Performance') {
+			agent { label 'performance_windows' }
+			steps {
 				unstash 'workspace-after-unit'
-			
-                bat '''
-                    whoami
-                    hostname
-                    echo %WORKSPACE%
-                    set FLASK_APP=app\\api.py
-                    start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flask run
-                    ping -n 6 127.0.0.1 > nul
-                    C:\\DevOps\\JMeter\\bin\\jmeter -n -t test\\jmeter\\flask.jmx -f -l flask.jtl
-                '''
-                perfReport sourceDataFiles: 'flask.jtl'
-            }
-        }
-		
+
+				dir('helloworld') {
+					bat '''
+						whoami
+						hostname
+						echo %WORKSPACE%
+
+						set FLASK_APP=app\\api.py
+						start "" C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m flask run
+
+						ping -n 6 127.0.0.1 > nul
+
+						C:\\DevOps\\JMeter\\bin\\jmeter -n -t test\\jmeter\\flask.jmx -f -l flask.jtl
+					'''
+				}
+
+				perfReport sourceDataFiles: 'helloworld/flask.jtl'
+			}
+		}
+	
     }
 }
