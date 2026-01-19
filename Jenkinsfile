@@ -19,6 +19,15 @@ pipeline {
             }
         }
 		
+				stage('Cobertura') {
+			steps {
+				bat '''
+					C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage xml
+				'''
+				recordCoverage qualityGates: [[criticality: 'ERROR', integerThreshold: 85, metric: 'LINE', threshold: 85.0],[integerThreshold: 95, metric: 'LINE', threshold: 95.0],[criticality: 'ERROR', integerThreshold: 80, metric: 'BRANCH', threshold: 80.0],[integerThreshold: 90, metric: 'BRANCH', threshold: 90.0]], tools: [[parser: 'COBERTURA', pattern: 'coverage.xml']]				
+			}
+		}
+		
 		stage('Static') {
 			steps {
 				bat '''
@@ -35,16 +44,6 @@ pipeline {
 				'''
 				recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')], qualityGates: [[threshold: 2, type: 'TOTAL', unstable: true],[threshold: 4, type: 'TOTAL', unstable: false]]
 				
-			}
-		}
-
-		stage('Cobertura') {
-			steps {
-				bat '''
-					set PYTHONPATH=.
-					C:\\Users\\denis\\AppData\\Local\\Programs\\Python\\Python314\\python.exe -m coverage xml
-				'''
-				recordCoverage qualityGates: [[criticality: 'ERROR', integerThreshold: 85, metric: 'LINE', threshold: 85.0],[integerThreshold: 95, metric: 'LINE', threshold: 95.0],[criticality: 'ERROR', integerThreshold: 80, metric: 'BRANCH', threshold: 80.0],[integerThreshold: 90, metric: 'BRANCH', threshold: 90.0]], tools: [[parser: 'COBERTURA', pattern: 'coverage.xml']]				
 			}
 		}
 
